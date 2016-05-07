@@ -1,5 +1,7 @@
 package supermaps.supermaps.lib;
 
+import android.content.Context;
+import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 import java.util.List;
@@ -8,10 +10,26 @@ import java.util.Map;
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class MapView {
+public class MapView extends FrameLayout {
 
     public com.google.android.gms.maps.MapView googleMapView;
     public FrameLayout frameLayout;
+
+    public MapView(Context context) {
+        super(context);
+    }
+
+    public MapView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    public MapView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    public MapView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        super(context, attrs, defStyleAttr, defStyleRes);
+    }
 
     /**
      * This add an annotation to the map.
