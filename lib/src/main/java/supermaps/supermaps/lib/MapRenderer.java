@@ -7,4 +7,10 @@ public interface MapRenderer {
 
     AnnotationView viewForAnnotation(Annotation annotation);
 
+    void annotationViewWillBeRemoved(AnnotationView annotationView);
+    void annotationViewDidRemove(AnnotationView annotationView);
+
+    void annotationViewWillBeAdded(AnnotationView annotationView);
+    void annotationViewDidAdd(AnnotationView annotationView);
+
 }
