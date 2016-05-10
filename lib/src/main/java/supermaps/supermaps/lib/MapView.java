@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +33,9 @@ public class MapView extends FrameLayout {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+    public void setCenterLatLng(LatLng latLng, Boolean animated){
+
+    }
     /**
      * This add an annotation to the map.
      * @param annotation
