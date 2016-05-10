@@ -1,6 +1,8 @@
 # supermaps
 Android Maps
 
+[![Build Status](https://travis-ci.org/supermaps/supermaps.svg?branch=develop)](https://travis-ci.org/supermaps/supermaps)
+
 Project Slack: https://supermapslibrary.slack.com
 
 
