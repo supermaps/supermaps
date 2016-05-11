@@ -1,4 +1,4 @@
-gitlanguage: android
+language: android
 
 jdk:
  - oraclejdk8
