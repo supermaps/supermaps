@@ -1,4 +1,4 @@
-language: android
+gitlanguage: android
 
 jdk:
  - oraclejdk8
@@ -13,7 +13,7 @@ android:
     - extra-google-google_play_services
     - addon-google_apis-google-19
     - extra-google-m2repository
-    - sys-img-armeabi-v7a-android-19
+    - sys-img-armeabi-v7a-android-23
 
 before_script:
   - echo no | android create avd --force -n test -t android-23 --abi armeabi-v7a
