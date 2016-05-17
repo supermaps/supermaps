@@ -84,7 +84,12 @@ public class MapView extends FrameLayout {
     }
 
 
+    /**
+     * Reposition any annotations in the viewport.
+     * When any coordinate changes or map bounds change
+     */
+    void mapCycle(){
 
-
+    }
 
 }
