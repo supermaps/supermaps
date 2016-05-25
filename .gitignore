@@ -13,6 +13,9 @@ local.properties
 # Signing files
 .signing/
 
+# Google API Keys
+app/src/main/res/values/keys.xml
+
 # User-specific configurations
 .idea/libraries/
 .idea/workspace.xml

@@ -17,6 +17,7 @@ public class MapView extends FrameLayout {
     public com.google.android.gms.maps.MapView googleMapView;
     public FrameLayout frameLayout;
 
+
     public MapView(Context context) {
         super(context);
     }
