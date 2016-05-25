@@ -14,7 +14,7 @@ local.properties
 .signing/
 
 # Google API Keys
-app/src/main/res/values/keys.xml
+./app/src/main/res/values/keys.xml
 
 # User-specific configurations
 .idea/libraries/
