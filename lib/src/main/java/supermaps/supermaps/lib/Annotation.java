@@ -9,9 +9,11 @@ import java.util.Observable;
  * This is equivalent to an index in RecyclerView. Since MapViews don't have index, we need a object that hosts a LatLng
  */
 public interface Annotation {
+    LatLng latLng = null;
 
     void setLatLng(LatLng latLng);
     LatLng getLatLng();
+
 
 }
 

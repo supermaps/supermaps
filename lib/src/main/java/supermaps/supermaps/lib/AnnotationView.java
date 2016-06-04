@@ -11,6 +11,20 @@ import android.view.View;
  */
 public abstract class AnnotationView extends View {
 
+    /**
+     * The User supplies a ReuseId for an AnnotationView And the mapmanager
+     * just remembers them and uses them to enqueue and dequeue
+     */
+    private String reuseId;
+
+    public String getReuseId() {
+        return reuseId;
+    }
+
+    public void setReuseId(String reuseId) {
+        this.reuseId = reuseId;
+    }
+
     public AnnotationView(Context context) {
         super(context);
     }
