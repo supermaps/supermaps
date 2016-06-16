@@ -3,16 +3,16 @@ package supermaps.supermap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import supermaps.supermaps.lib.MapView;
+import supermaps.supermaps.lib.SuperMap;
 
 public class MainActivity extends AppCompatActivity {
 
-    private MapView mMapView;
+    private SuperMap mSuperMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mMapView = (MapView)findViewById(R.id.map_view);
+        mSuperMap = (SuperMap)findViewById(R.id.map_view);
     }
 }

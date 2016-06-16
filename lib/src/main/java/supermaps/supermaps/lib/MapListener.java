@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
  */
 public interface MapListener {
 
-    LatLngBounds onRegionWillChange(MapView mapView);
-    LatLngBounds onRegionDidChange(MapView mapView);
+    LatLngBounds onRegionWillChange(SuperMap superMap);
+    LatLngBounds onRegionDidChange(SuperMap superMap);
 
 }

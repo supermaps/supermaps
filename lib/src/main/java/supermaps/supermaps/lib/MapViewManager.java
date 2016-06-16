@@ -24,7 +24,7 @@ class MapViewManager {
     private LatLngBounds latLngBounds;
 
     private GoogleMap googleMap;
-    private MapView superMapsView;
+    private SuperMap superMapsView;
 
     /**
      * Interface object for the renderer.
@@ -50,13 +50,13 @@ class MapViewManager {
     public MapViewManager(Map<String, AnnotationView> stringStringMap, Map<Annotation,
                         AnnotationView> annotationToAnnotationViewMap,
                           Map<String, List<AnnotationView>> mapReuseIdToAnnotationViews,
-                          MapView mapView) {
+                          SuperMap superMap) {
         this.stringStringMap = stringStringMap;
         this.annotationToAnnotationViewMap = annotationToAnnotationViewMap;
         this.mapReuseIdToAnnotationViews = mapReuseIdToAnnotationViews;
 
-        this.superMapsView = mapView;
-        this.googleMap = mapView.googleMap;
+        this.superMapsView = superMap;
+        this.googleMap = superMap.googleMap;
     }
 
     AnnotationView viewForAnnotation(Annotation annotation){

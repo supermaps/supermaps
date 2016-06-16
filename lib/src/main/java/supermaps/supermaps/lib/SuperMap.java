@@ -7,30 +7,29 @@ import android.widget.FrameLayout;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class MapView extends FrameLayout {
+public class SuperMap extends FrameLayout {
 
     public com.google.android.gms.maps.GoogleMap googleMap;
     public FrameLayout frameLayout;
 
 
-    public MapView(Context context) {
+    public SuperMap(Context context) {
         super(context);
     }
 
-    public MapView(Context context, AttributeSet attrs) {
+    public SuperMap(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MapView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SuperMap(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public MapView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public SuperMap(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
