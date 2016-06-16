@@ -1,6 +1,7 @@
 package supermaps.supermaps.lib;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -10,6 +11,9 @@ import android.view.View;
  * It will have a reference to the annotation that it represent.
  */
 public abstract class AnnotationView extends View {
+
+    abstract Annotation getAnnotation();
+    abstract void setAnnotation(Annotation annotation);
 
     /**
      * The User supplies a ReuseId for an AnnotationView And the mapmanager
@@ -41,7 +45,25 @@ public abstract class AnnotationView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    abstract Annotation getAnnotation();
-    abstract void setAnnotation(Annotation annotation);
+    public void clearAnnotationContext() {
+        this.setAnnotation(null);
+    }
 
+    /**
+     * Used to move the view on the screen.
+     * When the center is set the view is moved to the location specified by the parameters
+     *
+     * @param center
+     *
+     * The point (xPixelPosition,yPixelPosition) is the new position for the center of the view.
+     * the view is measured in pixels by the getHeight() and getWidth() methods
+     * */
+    public void setCenter(Point center) {
+        int y = this.getHeight()/2;
+        int x = this.getWidth()/2;
+
+        this.setX(center.x-x);
+        this.setY(center.y-y);
+
+    }
 }
