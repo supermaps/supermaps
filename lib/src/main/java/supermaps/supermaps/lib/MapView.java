@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class MapView extends FrameLayout {
 
-    public com.google.android.gms.maps.MapView googleMapView;
+    public com.google.android.gms.maps.GoogleMap googleMap;
     public FrameLayout frameLayout;
 
 
