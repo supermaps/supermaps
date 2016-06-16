@@ -1,5 +1,9 @@
 package supermaps.supermaps.lib;
 
+import android.graphics.Point;
+
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLngBounds;
 
 import java.util.ArrayList;
@@ -19,7 +23,8 @@ class MapViewManager {
     private Map<String, AnnotationView> stringStringMap = new HashMap<>();
     private LatLngBounds latLngBounds;
 
-    private com.google.android.gms.maps.MapView googleMapView;
+    private GoogleMap googleMap;
+    private MapView superMapsView;
 
     /**
      * Interface object for the renderer.
@@ -42,10 +47,16 @@ class MapViewManager {
 
     private Map<Annotation, AnnotationView> annotationToAnnotationViewMap = new HashMap<>();
 
-    public MapViewManager(Map<String, AnnotationView> stringStringMap, Map<Annotation, AnnotationView> annotationToAnnotationViewMap,Map<String, List<AnnotationView>> mapReuseIdToAnnotationViews) {
+    public MapViewManager(Map<String, AnnotationView> stringStringMap, Map<Annotation,
+                        AnnotationView> annotationToAnnotationViewMap,
+                          Map<String, List<AnnotationView>> mapReuseIdToAnnotationViews,
+                          MapView mapView) {
         this.stringStringMap = stringStringMap;
         this.annotationToAnnotationViewMap = annotationToAnnotationViewMap;
         this.mapReuseIdToAnnotationViews = mapReuseIdToAnnotationViews;
+
+        this.superMapsView = mapView;
+        this.googleMap = mapView.googleMap;
     }
 
     AnnotationView viewForAnnotation(Annotation annotation){
@@ -67,9 +78,20 @@ class MapViewManager {
      * @param annotationView
      */
     private void enqueueReusableAnnotationViewWithIdentifier(AnnotationView annotationView) {
+
+        if(annotationView == null) {
+            return;
+
+        }
+
         if(this.mapReuseIdToAnnotationViews.containsKey(annotationView.getReuseId())) {
+
+            //The mapReuseIdToAnnotationViews.get(annotationView.getReuseId()) returns a list.
             this.mapReuseIdToAnnotationViews.get(annotationView.getReuseId())
                     .add(annotationView);
+
+            //detach the context.
+            annotationView.clearAnnotationContext();
 
         }
     }
@@ -89,21 +111,27 @@ class MapViewManager {
             MapViewManager.this.activeAnnotationListOfVisibleAnnotations = new ArrayList<>();
         }
 
+        /**
+         * Getting the latlongBounds from the map. This is the maps latlngbounds.
+         * We need to get the View system conversion of the latlng.
+         */
+        Projection currentProjection = this.googleMap.getProjection();
+        this.latLngBounds = currentProjection.getVisibleRegion().latLngBounds;
+
+        /**
+         * Purpose is to loop through all the annotations and make the necessary changes based on:
+         * 1) latlong bounds contain an annotation && View is on screen move it
+         * 2) latlong bounds contains an annotation but view doesnt exist - GET VIEW!!!!
+         * 3) latlong bounds doesnt contain do nothing
+         * 4) latlong bounds doesnt contain annotation && View has moved off screen now. - recycle
+         */
         for (Annotation annotation :
             MapViewManager.this.annotationToAnnotationViewMap.keySet()) {
-
-            /**
-             * 1) latlong bounds contain an annotation && View is on screen move it
-             * 2) latlong bounds contains an annotation but view doesnt exist - GET VIEW!!!!
-             * 3) latlong bounds doesnt contain do nothing
-             * 4) latlong bounds doesnt contain annotation && View has moved off screen now. - recycle
-             */
 
             /**
              * 1) the view is visible, and we need to make sure that the view is visible and available.
              * 2) enqueue the view so we have a list of views associated with the annotation type
              * 3)
-             *
              */
             if(this.latLngBounds.contains(annotation.getLatLng())) {
                 //May need to move to somewhere else
@@ -117,7 +145,12 @@ class MapViewManager {
                 if(this.annotationToAnnotationViewMap.containsKey(annotation)) {
                     if(this.annotationToAnnotationViewMap.get(annotation) == null) {
                         //create view
+                        // TODO - MapViewManager#update create AnnotationView by using the interface.
+                        AnnotationView annotationView = this.dequeueReusableAnnotationViewWithIdentifier("");
 
+                        Point currentPoint = currentProjection.toScreenLocation(annotation.getLatLng());
+
+                        annotationView.setCenter(currentPoint);
 
                     } else {
                         //TODO try to enqueue and dequeue the annotation view.
@@ -132,9 +165,10 @@ class MapViewManager {
                  * call for a view
                  */
             } else {
-                //Annotation is not visible enqueue?
+                //Annotation is not visible. enqueue..will take care of null return from list.
+                this.enqueueReusableAnnotationViewWithIdentifier(this.annotationToAnnotationViewMap.get(annotation));
 
-
+                //part of the view is visible.
             }
         }
     }
