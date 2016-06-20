@@ -1,6 +1,7 @@
 package supermaps.supermaps.lib;
 
 import android.graphics.Point;
+import android.graphics.Rect;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.Projection;
@@ -17,6 +18,7 @@ import java.util.Map;
  */
 class MapViewManager {
 
+    Rect superMapsFrameLayoutRect;
     /**
      *
      */
@@ -43,34 +45,77 @@ class MapViewManager {
      * @see AnnotationView#reuseId
      * List of annotation views that are used for reuse when required.
      */
-    private Map<String, List<AnnotationView>> mapReuseIdToAnnotationViews;
+    private Map<String, List<AnnotationView>> mapReuseIdToAnnotationViewsQueue;
 
     private Map<Annotation, AnnotationView> annotationToAnnotationViewMap = new HashMap<>();
 
     public MapViewManager(Map<String, AnnotationView> stringStringMap, Map<Annotation,
                         AnnotationView> annotationToAnnotationViewMap,
-                          Map<String, List<AnnotationView>> mapReuseIdToAnnotationViews,
+                          Map<String, List<AnnotationView>> mapReuseIdToAnnotationViewsQueue,
                           SuperMap superMap) {
         this.stringStringMap = stringStringMap;
         this.annotationToAnnotationViewMap = annotationToAnnotationViewMap;
-        this.mapReuseIdToAnnotationViews = mapReuseIdToAnnotationViews;
+        this.mapReuseIdToAnnotationViewsQueue = mapReuseIdToAnnotationViewsQueue;
 
         this.superMapsView = superMap;
         this.googleMap = superMap.googleMap;
+
+        this.superMapsFrameLayoutRect = new Rect();
     }
 
     AnnotationView viewForAnnotation(Annotation annotation){
         return annotationToAnnotationViewMap.get(annotation);
     }
 
+    public List<Annotation> getCurrentlyVisibleAnnotations() {
+
+        List<Annotation> currentVisibleAnnotations = new ArrayList<>();
+
+        for(int childCountIndex = 0;
+            childCountIndex < this.superMapsView.frameLayout.getChildCount();
+            childCountIndex++) {
+
+            AnnotationView annotationView = (AnnotationView) this.superMapsView.frameLayout.getChildAt(childCountIndex);
+
+            if(annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)) {
+                currentVisibleAnnotations.add(annotationView.getAnnotation());
+
+            }
+        }
+
+        return currentVisibleAnnotations;
+    }
 
     /**
-     * TODO MapViewManager.dequeueReusableAnnotationViewWithIdentifier(String reuseId) temp need to figure this out
      * @param reuseId
      * @return
      */
     public AnnotationView dequeueReusableAnnotationViewWithIdentifier(String reuseId) {
-        return this.mapReuseIdToAnnotationViews.get(reuseId).get(0);
+
+        List<AnnotationView> annotationViewList = this.mapReuseIdToAnnotationViewsQueue.get(reuseId);
+
+        AnnotationView annotationView;
+
+        if(annotationViewList != null) {
+            annotationView = annotationViewList.size() > 0 ? annotationViewList.get(0) : null;
+
+        } else {
+            return null;
+
+        }
+
+        if(annotationView != null) {
+            /**
+             * the prepare for reuse method is a stub that the user should implement if necessary.
+             *
+             * @see AnnotationView#prepareForReuse()
+             */
+            annotationView.prepareForReuse();
+            annotationViewList.remove(annotationView);
+            annotationView.clearAnnotationContext();
+        }
+
+        return annotationView;
     }
 
     /**
@@ -84,14 +129,11 @@ class MapViewManager {
 
         }
 
-        if(this.mapReuseIdToAnnotationViews.containsKey(annotationView.getReuseId())) {
+        if(this.mapReuseIdToAnnotationViewsQueue.containsKey(annotationView.getReuseId())) {
 
-            //The mapReuseIdToAnnotationViews.get(annotationView.getReuseId()) returns a list.
-            this.mapReuseIdToAnnotationViews.get(annotationView.getReuseId())
+            //The mapReuseIdToAnnotationViewsQueue.get(annotationView.getReuseId()) returns a list.
+            this.mapReuseIdToAnnotationViewsQueue.get(annotationView.getReuseId())
                     .add(annotationView);
-
-            //detach the context.
-            annotationView.clearAnnotationContext();
 
         }
     }
@@ -106,10 +148,6 @@ class MapViewManager {
      * </p>
      */
     private void update() {
-
-        if(MapViewManager.this.activeAnnotationListOfVisibleAnnotations == null) {
-            MapViewManager.this.activeAnnotationListOfVisibleAnnotations = new ArrayList<>();
-        }
 
         /**
          * Getting the latlongBounds from the map. This is the maps latlngbounds.
@@ -133,9 +171,6 @@ class MapViewManager {
              * 2) enqueue the view so we have a list of views associated with the annotation type
              * 3)
              */
-            if(this.latLngBounds.contains(annotation.getLatLng())) {
-                //May need to move to somewhere else
-                MapViewManager.this.activeAnnotationListOfVisibleAnnotations.add(annotation);
 
                 /**
                  * checking to make sure the annontation has a view associated with it.
@@ -145,31 +180,41 @@ class MapViewManager {
                 if(this.annotationToAnnotationViewMap.containsKey(annotation)) {
                     if(this.annotationToAnnotationViewMap.get(annotation) == null) {
                         //create view
-                        // TODO - MapViewManager#update create AnnotationView by using the interface.
-                        AnnotationView annotationView = this.dequeueReusableAnnotationViewWithIdentifier("");
+                        AnnotationView annotationView = this.mapRenderer.viewForAnnotation(annotation, this);
+
+                        //Annotation View will not be null at this point!
+                        if(annotationView == null) {
+                            throw new NullPointerException("Can not return a null annotation view from viewForAnnotation. The user must implement the method");
+
+                        }
+
+                        if(annotationView.getParent() == null) {
+                            this.superMapsView.frameLayout.addView(annotationView);
+                        }
 
                         Point currentPoint = currentProjection.toScreenLocation(annotation.getLatLng());
 
                         annotationView.setCenter(currentPoint);
 
-                    } else {
-                        //TODO try to enqueue and dequeue the annotation view.
+                        /**
+                         * check if this view is within the bounds of the screen else enqueue it
+                         */
+                        this.superMapsView.frameLayout.getHitRect(superMapsFrameLayoutRect);
 
+                        if(annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)){
+                            //View is visible even it its 1px
+                        } else {
+                            //Enqueue the view with the reuse ID
+                            this.enqueueReusableAnnotationViewWithIdentifier(annotationView);
+                        }
 
                     }
-
                 }
 
                 /**
                  * lat lng -> viewport system
                  * call for a view
                  */
-            } else {
-                //Annotation is not visible. enqueue..will take care of null return from list.
-                this.enqueueReusableAnnotationViewWithIdentifier(this.annotationToAnnotationViewMap.get(annotation));
-
-                //part of the view is visible.
-            }
         }
     }
 }
