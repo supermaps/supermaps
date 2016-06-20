@@ -18,11 +18,16 @@ public abstract class AnnotationView extends View {
     /**
      * The User supplies a ReuseId for an AnnotationView And the mapmanager
      * just remembers them and uses them to enqueue and dequeue
+     *
+     * Added a default Value because we have a system of reusing the views.
+     * The user may not provide a reuseID in which case all the views will get enqueued.
+     *
+     *
      */
     private String reuseId;
 
     public String getReuseId() {
-        return reuseId;
+        return this.reuseId == null ? "defaultID" : this.reuseId;
     }
 
     public void setReuseId(String reuseId) {
@@ -45,6 +50,24 @@ public abstract class AnnotationView extends View {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+    /**
+     * NOT REQUIRED: Do not need to use this method.
+     *
+     * super does nothing. Stub for implementer to build if required.
+     *
+     * Implement this method for when the view is being reused. The reuse is based on the
+     * String reuseId.
+     *
+     * null all the contents of the views and clear out the images and text.
+     *
+     * Dispose anything the view may have caused to run in background or other long running tasks.
+     */
+    public void prepareForReuse() {}
+
+    /**
+     * Clears the association of the annotation with the view allowing it to be reused for a
+     * different annotation that has the same reuseId
+     */
     public void clearAnnotationContext() {
         this.setAnnotation(null);
     }
