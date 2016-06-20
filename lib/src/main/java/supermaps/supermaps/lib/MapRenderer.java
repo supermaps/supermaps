@@ -5,7 +5,7 @@ package supermaps.supermaps.lib;
  */
 public interface MapRenderer {
 
-    AnnotationView viewForAnnotation(Annotation annotation);
+    AnnotationView viewForAnnotation(Annotation annotation, MapViewManager mapViewManager);
 
     void annotationViewWillBeRemoved(AnnotationView annotationView);
     void annotationViewDidRemove(AnnotationView annotationView);
