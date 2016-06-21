@@ -63,10 +63,21 @@ class MapViewManager {
         this.superMapsFrameLayoutRect = new Rect();
     }
 
+    /**
+     * Helper method for the user so they can access the map
+     *
+     * @param annotation
+     * @return
+     */
     AnnotationView viewForAnnotation(Annotation annotation){
         return annotationToAnnotationViewMap.get(annotation);
     }
 
+    /**
+     * Helper method for the user so they can access the map
+     *
+     * @return
+     */
     public List<Annotation> getCurrentlyVisibleAnnotations() {
 
         List<Annotation> currentVisibleAnnotations = new ArrayList<>();
