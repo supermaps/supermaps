@@ -2,20 +2,22 @@ package supermaps.supermaps.lib;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class SuperMap extends FrameLayout {
+public class SuperMap extends FrameLayout implements TouchableWrapper.TouchAction {
 
-    public com.google.android.gms.maps.GoogleMap googleMap;
-    public FrameLayout frameLayout;
-
+    com.google.android.gms.maps.GoogleMap googleMap;
+    TouchableWrapper touchableWrapper;
+    MapViewManager mapViewManager;
 
     public SuperMap(Context context) {
         super(context);
@@ -23,6 +25,7 @@ public class SuperMap extends FrameLayout {
 
     public SuperMap(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.commonInit(context, attrs);
     }
 
     public SuperMap(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -36,20 +39,46 @@ public class SuperMap extends FrameLayout {
     public void setCenterLatLng(LatLng latLng, Boolean animated){
 
     }
-    /**
-     * This add an annotation to the map.
-     * @param annotation
-     */
-    void addAnnotation(Annotation annotation) {
+
+    private void commonInit(Context context, AttributeSet attrs) {
+
+        if(this.touchableWrapper == null) {
+            this.touchableWrapper = new TouchableWrapper(context, attrs);
+
+        }
+
+        this.touchableWrapper.setmTouchAction(this);
+        this.mapViewManager = new MapViewManager(this);
 
     }
 
     /**
-     * This removes an annotation if it exists from the map.
-     * @param annotation
+     * This add an annotation to the map.
+     * @param annotations
      */
-    void removeAnnotation(Annotation annotation){
+    void addAnnotations(Annotation[] annotations) {
 
+        for (Annotation annotation :
+                annotations) {
+            this.mapViewManager.annotationToAnnotationViewMap.put(annotation, null);
+
+        }
+
+        this.mapCycle();
+    }
+
+    /**
+     * This removes an annotation if it exists from the map.
+     * @param annotations
+     */
+    void removeAnnotations(Annotation[] annotations){
+
+        for (Annotation annotation :
+                annotations) {
+            this.mapViewManager.annotationToAnnotationViewMap.remove(annotation);
+        }
+
+        this.mapCycle();
     }
 
     /**
@@ -59,9 +88,11 @@ public class SuperMap extends FrameLayout {
      * @param annotation the annotation that you're looking for. You should give an annotation
      *                   that is already being tracked.
      * @return AnnotationView instance if it exists.
+     *
+     *
      */
-    AnnotationView getViewForAnnotation(Annotation annotation){
-        return null;
+    public AnnotationView getViewForAnnotation(Annotation annotation){
+        return this.mapViewManager.viewForAnnotation(annotation);
     }
 
     /**
@@ -71,8 +102,8 @@ public class SuperMap extends FrameLayout {
      *                want back.
      * @return a reusable AnnotationView, If it's null, then no AnnotationView is available to be reused.
      */
-    AnnotationView dequeueAnnotationViewWithReuseId(String reuseId){
-        return null;
+    public AnnotationView dequeueAnnotationViewWithReuseId(String reuseId){
+        return this.mapViewManager.dequeueReusableAnnotationViewWithIdentifier(reuseId);
     }
 
     /**
@@ -80,7 +111,15 @@ public class SuperMap extends FrameLayout {
      * @return A List of AnnotationViews that have overlapping frames with the map.
      */
     private List<AnnotationView> getVisibleAnnotationViews(){
-        return null;
+
+        List<AnnotationView> visibleAnnotationViewslist = new ArrayList<>();
+
+        for (Annotation annotation :
+                this.mapViewManager.getCurrentlyVisibleAnnotations()) {
+            visibleAnnotationViewslist.add(this.mapViewManager.annotationToAnnotationViewMap.get(annotation));
+        }
+
+        return visibleAnnotationViewslist;
     }
 
 
@@ -89,7 +128,12 @@ public class SuperMap extends FrameLayout {
      * When any coordinate changes or map bounds change
      */
     void mapCycle(){
-
+        this.mapViewManager.update();
     }
 
+    @Override
+    public void onTouch(MotionEvent event) {
+        this.mapCycle();
+
+    }
 }
