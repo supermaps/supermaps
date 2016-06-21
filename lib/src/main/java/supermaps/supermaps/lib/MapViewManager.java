@@ -19,10 +19,7 @@ import java.util.Map;
 class MapViewManager {
 
     Rect superMapsFrameLayoutRect;
-    /**
-     *
-     */
-    private Map<String, AnnotationView> stringStringMap = new HashMap<>();
+
     private LatLngBounds latLngBounds;
 
     private GoogleMap googleMap;
@@ -35,11 +32,6 @@ class MapViewManager {
     MapRenderer mapRenderer;
 
     /**
-     * Annotations whose latlng are within the bounds.
-     */
-    List<Annotation> activeAnnotationListOfVisibleAnnotations;
-
-    /**
      *
      * String reuseID:
      * @see AnnotationView#reuseId
@@ -47,20 +39,16 @@ class MapViewManager {
      */
     private Map<String, List<AnnotationView>> mapReuseIdToAnnotationViewsQueue;
 
-    private Map<Annotation, AnnotationView> annotationToAnnotationViewMap = new HashMap<>();
+    Map<Annotation, AnnotationView> annotationToAnnotationViewMap;
 
-    public MapViewManager(Map<String, AnnotationView> stringStringMap, Map<Annotation,
-                        AnnotationView> annotationToAnnotationViewMap,
-                          Map<String, List<AnnotationView>> mapReuseIdToAnnotationViewsQueue,
-                          SuperMap superMap) {
-        this.stringStringMap = stringStringMap;
-        this.annotationToAnnotationViewMap = annotationToAnnotationViewMap;
-        this.mapReuseIdToAnnotationViewsQueue = mapReuseIdToAnnotationViewsQueue;
-
+    public MapViewManager(SuperMap superMap) {
         this.superMapsView = superMap;
         this.googleMap = superMap.googleMap;
 
         this.superMapsFrameLayoutRect = new Rect();
+
+        this.annotationToAnnotationViewMap = new HashMap<>();
+        this.mapReuseIdToAnnotationViewsQueue = new HashMap<>();
     }
 
     /**
@@ -70,7 +58,7 @@ class MapViewManager {
      * @return
      */
     AnnotationView viewForAnnotation(Annotation annotation){
-        return annotationToAnnotationViewMap.get(annotation);
+        return this.annotationToAnnotationViewMap.get(annotation);
     }
 
     /**
@@ -83,10 +71,10 @@ class MapViewManager {
         List<Annotation> currentVisibleAnnotations = new ArrayList<>();
 
         for(int childCountIndex = 0;
-            childCountIndex < this.superMapsView.frameLayout.getChildCount();
+            childCountIndex < this.superMapsView.touchableWrapper.getChildCount();
             childCountIndex++) {
 
-            AnnotationView annotationView = (AnnotationView) this.superMapsView.frameLayout.getChildAt(childCountIndex);
+            AnnotationView annotationView = (AnnotationView) this.superMapsView.touchableWrapper.getChildAt(childCountIndex);
 
             if(annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)) {
                 currentVisibleAnnotations.add(annotationView.getAnnotation());
@@ -158,7 +146,7 @@ class MapViewManager {
      * </b>
      * </p>
      */
-    private void update() {
+    void update() {
 
         /**
          * Getting the latlongBounds from the map. This is the maps latlngbounds.
@@ -200,7 +188,7 @@ class MapViewManager {
                         }
 
                         if(annotationView.getParent() == null) {
-                            this.superMapsView.frameLayout.addView(annotationView);
+                            this.superMapsView.touchableWrapper.addView(annotationView);
                         }
 
                         Point currentPoint = currentProjection.toScreenLocation(annotation.getLatLng());
@@ -210,7 +198,7 @@ class MapViewManager {
                         /**
                          * check if this view is within the bounds of the screen else enqueue it
                          */
-                        this.superMapsView.frameLayout.getHitRect(superMapsFrameLayoutRect);
+                        this.superMapsView.touchableWrapper.getHitRect(superMapsFrameLayoutRect);
 
                         if(annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)){
                             //View is visible even it its 1px
