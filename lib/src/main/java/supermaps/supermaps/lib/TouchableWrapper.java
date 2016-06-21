@@ -14,6 +14,10 @@ public class TouchableWrapper extends FrameLayout {
 
     private TouchAction mTouchAction;
 
+    public void setmTouchAction(TouchAction mTouchAction) {
+        this.mTouchAction = mTouchAction;
+    }
+
     public TouchableWrapper(Context context) {
         super(context);
     }
