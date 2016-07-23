@@ -1,12 +1,15 @@
 package supermaps.supermaps.lib;
 
-import android.content.Context;
-import android.util.AttributeSet;
+import android.app.Fragment;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.widget.FrameLayout;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -16,37 +19,26 @@ import java.util.List;
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class SuperMap extends FrameLayout implements TouchableWrapper.TouchAction, OnMapReadyCallback {
+public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, OnMapReadyCallback {
 
     GoogleMap googleMap;
     TouchableWrapper touchableWrapper;
     MapViewManager mapViewManager;
-    private MapView superMapGoogleMapView;
-
-    public SuperMap(Context context) {
-        super(context);
-    }
-
-    public SuperMap(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
-
-    public SuperMap(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-    }
-
-    public SuperMap(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-    }
+    private MapFragment superMapGoogleMapFragment;
+    private View rootView;
 
     public void setCenterLatLng(LatLng latLng, Boolean animated){
 
     }
 
-    public void commonInit() {
-        superMapGoogleMapView = (MapView) this.findViewById(R.id.superMapGoogleMapView);
-        superMapGoogleMapView.getMapAsync(this);
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        rootView = inflater.inflate(R.layout.layout, null);
 
+        superMapGoogleMapFragment = (MapFragment) this.getChildFragmentManager().findFragmentById(R.id.superMapGoogleMapFragment);
+        superMapGoogleMapFragment.getMapAsync(this);
+        return rootView;
     }
 
     /**
@@ -136,7 +128,7 @@ public class SuperMap extends FrameLayout implements TouchableWrapper.TouchActio
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        this.touchableWrapper = (TouchableWrapper) this.findViewById(R.id.touchableWrapper);
+        this.touchableWrapper = (TouchableWrapper) this.getView().findViewById(R.id.touchableWrapper);
         this.googleMap = googleMap;
 
         this.touchableWrapper.setmTouchAction(this);
