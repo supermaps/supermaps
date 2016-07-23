@@ -5,6 +5,9 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
@@ -13,11 +16,12 @@ import java.util.List;
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class SuperMap extends FrameLayout implements TouchableWrapper.TouchAction {
+public class SuperMap extends FrameLayout implements TouchableWrapper.TouchAction, OnMapReadyCallback {
 
-    com.google.android.gms.maps.GoogleMap googleMap;
+    GoogleMap googleMap;
     TouchableWrapper touchableWrapper;
     MapViewManager mapViewManager;
+    private MapView superMapGoogleMapView;
 
     public SuperMap(Context context) {
         super(context);
@@ -25,7 +29,6 @@ public class SuperMap extends FrameLayout implements TouchableWrapper.TouchActio
 
     public SuperMap(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.commonInit(context, attrs);
     }
 
     public SuperMap(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -40,15 +43,9 @@ public class SuperMap extends FrameLayout implements TouchableWrapper.TouchActio
 
     }
 
-    private void commonInit(Context context, AttributeSet attrs) {
-
-        if(this.touchableWrapper == null) {
-            this.touchableWrapper = new TouchableWrapper(context, attrs);
-
-        }
-
-        this.touchableWrapper.setmTouchAction(this);
-        this.mapViewManager = new MapViewManager(this);
+    public void commonInit() {
+        superMapGoogleMapView = (MapView) this.findViewById(R.id.superMapGoogleMapView);
+        superMapGoogleMapView.getMapAsync(this);
 
     }
 
@@ -135,5 +132,14 @@ public class SuperMap extends FrameLayout implements TouchableWrapper.TouchActio
     public void onTouch(MotionEvent event) {
         this.mapCycle();
 
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.touchableWrapper = (TouchableWrapper) this.findViewById(R.id.touchableWrapper);
+        this.googleMap = googleMap;
+
+        this.touchableWrapper.setmTouchAction(this);
+        this.mapViewManager = new MapViewManager(this);
     }
 }
