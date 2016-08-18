@@ -12,8 +12,8 @@ import android.view.View;
  */
 public abstract class AnnotationView extends View {
 
-    abstract Annotation getAnnotation();
-    abstract void setAnnotation(Annotation annotation);
+    public abstract Annotation getAnnotation();
+    public abstract void setAnnotation(Annotation annotation);
 
     /**
      * The User supplies a ReuseId for an AnnotationView And the mapmanager
