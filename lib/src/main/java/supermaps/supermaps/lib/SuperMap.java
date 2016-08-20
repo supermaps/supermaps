@@ -99,7 +99,7 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
             this.annotationToAnnotationViewMap.put(annotation, null);
 
         }
-        this.mapCycle();
+        this.update();
     }
 
     /**
@@ -122,7 +122,7 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
             this.annotationToAnnotationViewMap.remove(annotation);
         }
 
-        this.mapCycle();
+        this.update();
     }
 
     /**
@@ -166,18 +166,9 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
         return visibleAnnotationViewslist;
     }
 
-
-    /**
-     * Reposition any annotations in the viewport.
-     * When any coordinate changes or map bounds change
-     */
-    void mapCycle(){
-        this.update();
-    }
-
     @Override
     public void onTouch(MotionEvent event) {
-        this.mapCycle();
+        this.update();
 
     }
 
@@ -190,7 +181,7 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
 
         this.setMapRenderer(this.mapRenderer);
 
-        this.mapCycle();
+        this.update();
     }
 
     public void setMapRenderer(MapRenderer mapRenderer) {
@@ -244,7 +235,6 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
 
         if(annotationViewList != null) {
             annotationView = annotationViewList.size() > 0 ? annotationViewList.get(0) : null;
-
         } else {
             return null;
 
@@ -281,7 +271,16 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
             this.mapReuseIdToAnnotationViewsQueue.get(annotationView.getReuseId())
                     .add(annotationView);
 
+        } else {
+            //Create the list to id map value
+            List<AnnotationView> annotationViewList = new ArrayList<>();
+            annotationViewList.add(annotationView);
+
+            this.mapReuseIdToAnnotationViewsQueue.put(annotationView.getReuseId(), annotationViewList);
+
+
         }
+
     }
 
     /**
@@ -325,16 +324,16 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
              * 2) enqueue the view so we have a list of views associated with the annotation type
              * 3)
              */
+            AnnotationView annotationView = this.annotationToAnnotationViewMap.get(annotation);
 
             /**
              * checking to make sure the annontation has a view associated with it.
              * Try and make sure if the view is null the annotation view entry is removed
              * from the map
              */
-            if(this.annotationToAnnotationViewMap.containsKey(annotation)) {
-                if(this.annotationToAnnotationViewMap.get(annotation) == null) {
-                    //create view
-                    AnnotationView annotationView = this.mapRenderer.viewForAnnotation(annotation);
+            if(annotationView == null) {
+                    //reuse/create or ask for view.
+                    annotationView = this.mapRenderer.viewForAnnotation(annotation);
 
                     //Annotation View will not be null at this point!
                     if(annotationView == null) {
@@ -342,33 +341,33 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
 
                     }
 
+                    this.annotationToAnnotationViewMap.put(annotation, annotationView);
+
                     if(annotationView.getParent() == null) {
                         this.touchableWrapper.addView(annotationView);
                     }
 
-                    Point currentPoint = currentProjection.toScreenLocation(annotation.getLatLng());
 
-                    annotationView.setCenter(currentPoint);
 
-                    /**
-                     * check if this view is within the bounds of the screen else enqueue it
-                     */
-                    this.touchableWrapper.getHitRect(superMapsFrameLayoutRect);
+            }
+            /**
+             * check if this view is within the bounds of the screen else enqueue it
+             */
+            this.touchableWrapper.getHitRect(superMapsFrameLayoutRect);
 
-                    if(annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)){
-                        //View is visible even if its 1px
-                    } else {
-                        //Enqueue the view with the reuse ID
-                        this.enqueueReusableAnnotationViewWithIdentifier(annotationView);
-                    }
-
-                }
+            if(superMapsFrameLayoutRect == null) {
+                throw new NullPointerException("supermaps FrameLayout Rect is null");
             }
 
-            /**
-             * lat lng -> viewport system
-             * call for a view
-             */
+            if (annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)) {
+                //View is visible even if its 1px
+                Point currentPoint = currentProjection.toScreenLocation(annotation.getLatLng());
+
+                annotationView.setCenter(currentPoint);
+            } else {
+                //Enqueue the view with the reuse ID
+                this.enqueueReusableAnnotationViewWithIdentifier(annotationView);
+            }
         }
     }
 }
