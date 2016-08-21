@@ -25,7 +25,7 @@ import java.util.Map;
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class SuperMap extends Fragment implements AnnotationViewWrapper.TouchAction, OnMapReadyCallback {
+public class SuperMap extends Fragment implements OnMapReadyCallback {
 
     AnnotationViewWrapper annotationViewWrapper;
     private MapFragment superMapGoogleMapFragment;
@@ -167,17 +167,9 @@ public class SuperMap extends Fragment implements AnnotationViewWrapper.TouchAct
     }
 
     @Override
-    public void onTouch(MotionEvent event) {
-        this.update();
-
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         this.annotationViewWrapper = (AnnotationViewWrapper) this.getView().findViewById(R.id.touchableWrapper);
         this.googleMap = googleMap;
-
-        this.annotationViewWrapper.setmTouchAction(this);
 
         this.setMapRenderer(this.mapRenderer);
 
