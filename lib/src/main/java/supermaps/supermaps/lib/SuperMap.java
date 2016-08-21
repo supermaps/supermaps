@@ -25,9 +25,9 @@ import java.util.Map;
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, OnMapReadyCallback {
+public class SuperMap extends Fragment implements AnnotationViewWrapper.TouchAction, OnMapReadyCallback {
 
-    TouchableWrapper touchableWrapper;
+    AnnotationViewWrapper annotationViewWrapper;
     private MapFragment superMapGoogleMapFragment;
     private View rootView;
 
@@ -174,10 +174,10 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        this.touchableWrapper = (TouchableWrapper) this.getView().findViewById(R.id.touchableWrapper);
+        this.annotationViewWrapper = (AnnotationViewWrapper) this.getView().findViewById(R.id.touchableWrapper);
         this.googleMap = googleMap;
 
-        this.touchableWrapper.setmTouchAction(this);
+        this.annotationViewWrapper.setmTouchAction(this);
 
         this.setMapRenderer(this.mapRenderer);
 
@@ -208,10 +208,10 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
         List<Annotation> currentVisibleAnnotations = new ArrayList<>();
 
         for(int childCountIndex = 0;
-            childCountIndex < this.touchableWrapper.getChildCount();
+            childCountIndex < this.annotationViewWrapper.getChildCount();
             childCountIndex++) {
 
-            AnnotationView annotationView = (AnnotationView) this.touchableWrapper.getChildAt(childCountIndex);
+            AnnotationView annotationView = (AnnotationView) this.annotationViewWrapper.getChildAt(childCountIndex);
 
             if(annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)) {
                 currentVisibleAnnotations.add(annotationView.getAnnotation());
@@ -350,15 +350,15 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
                 /**
                  *  Check if the touchable wrapper is the parent of the current view we have received
                  */
-                if(annotationView.getParent() != this.touchableWrapper) {
-                    this.touchableWrapper.addView(annotationView);
+                if(annotationView.getParent() != this.annotationViewWrapper) {
+                    this.annotationViewWrapper.addView(annotationView);
                 }
             }
 
             /**
              * check if this view is within the bounds of the screen else enqueue it
              */
-            this.touchableWrapper.getHitRect(superMapsFrameLayoutRect);
+            this.annotationViewWrapper.getHitRect(superMapsFrameLayoutRect);
 
             if(superMapsFrameLayoutRect == null) {
                 throw new NullPointerException("supermaps FrameLayout Rect is null");

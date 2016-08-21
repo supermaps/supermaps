@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
-public class TouchableWrapper extends FrameLayout {
+public class AnnotationViewWrapper extends FrameLayout {
 
     public interface TouchAction {
         void onTouch(MotionEvent event);
@@ -19,7 +19,7 @@ public class TouchableWrapper extends FrameLayout {
         this.mTouchAction = mTouchAction;
     }
 
-    public TouchableWrapper(Context context) {
+    public AnnotationViewWrapper(Context context) {
         super(context);
 
         this.initialize();
@@ -29,17 +29,17 @@ public class TouchableWrapper extends FrameLayout {
     }
 
 
-    public TouchableWrapper(Context context, AttributeSet attrs) {
+    public AnnotationViewWrapper(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.initialize();
     }
 
-    public TouchableWrapper(Context context, AttributeSet attrs, int defStyleAttr) {
+    public AnnotationViewWrapper(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.initialize();
     }
 
-    public TouchableWrapper(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public AnnotationViewWrapper(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         this.initialize();
     }
