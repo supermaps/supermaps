@@ -5,18 +5,9 @@ import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.widget.FrameLayout;
 
-public class TouchableWrapper extends FrameLayout implements View.OnTouchListener {
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        Log.d("TouchableWeapperLogs", "any-new");
-        this.mTouchAction.onTouch(event);
-
-        return false;
-    }
+public class TouchableWrapper extends FrameLayout {
 
     public interface TouchAction {
         void onTouch(MotionEvent event);
@@ -30,29 +21,27 @@ public class TouchableWrapper extends FrameLayout implements View.OnTouchListene
 
     public TouchableWrapper(Context context) {
         super(context);
+
         this.initialize();
     }
 
     private void initialize() {
-        this.setOnTouchListener(this);
     }
+
 
     public TouchableWrapper(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.initialize();
-
     }
 
     public TouchableWrapper(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.initialize();
-
     }
 
     public TouchableWrapper(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         this.initialize();
-
     }
 
     public boolean dispatchTouchEvent(MotionEvent motionEvent) {

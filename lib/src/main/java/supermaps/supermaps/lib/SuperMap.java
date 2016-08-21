@@ -332,24 +332,29 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
              * from the map
              */
             if(annotationView == null) {
-                    //reuse/create or ask for view.
-                    annotationView = this.mapRenderer.viewForAnnotation(annotation);
+                //reuse/create or ask for view.
+                annotationView = this.mapRenderer.viewForAnnotation(annotation);
 
-                    //Annotation View will not be null at this point!
-                    if(annotationView == null) {
-                        throw new NullPointerException("Can not return a null annotation view from viewForAnnotation. The user must implement the method");
+                //Annotation View will not be null at this point!
+                if(annotationView == null) {
+                    throw new NullPointerException("Can not return a null annotation view from viewForAnnotation. The user must implement the method");
 
-                    }
+                }
 
-                    this.annotationToAnnotationViewMap.put(annotation, annotationView);
+                /**
+                 * Maps the annotation to the annotation View for future use when we need a view
+                 * for this annotation
+                 */
+                this.annotationToAnnotationViewMap.put(annotation, annotationView);
 
-                    if(annotationView.getParent() == null) {
-                        this.touchableWrapper.addView(annotationView);
-                    }
-
-
-
+                /**
+                 *  Check if the touchable wrapper is the parent of the current view we have received
+                 */
+                if(annotationView.getParent() != this.touchableWrapper) {
+                    this.touchableWrapper.addView(annotationView);
+                }
             }
+
             /**
              * check if this view is within the bounds of the screen else enqueue it
              */
@@ -370,4 +375,6 @@ public class SuperMap extends Fragment implements TouchableWrapper.TouchAction, 
             }
         }
     }
+
+
 }
