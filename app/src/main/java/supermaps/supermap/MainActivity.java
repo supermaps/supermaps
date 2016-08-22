@@ -6,6 +6,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import supermaps.supermaps.lib.Annotation;
@@ -23,16 +26,22 @@ public class MainActivity extends AppCompatActivity implements MapRenderer {
 
     private static final String REUSER_ID1 = "demoResuseId1";
     private static final String REUSER_ID2 = "demoResuseId2";
+    private int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SuperMapDemoAnnotation superMapDemoAnnotation = new SuperMapDemoAnnotation();
+        this.superMapDemoAnnotationList = new ArrayList<>();
+
+        this.superMapDemoAnnotationList.add(new SuperMapDemoAnnotation());
+        this.superMapDemoAnnotationList.add(new SuperMapDemoAnnotation(new LatLng(42.87, -88.31)));
+        this.superMapDemoAnnotationList.add(new SuperMapDemoAnnotation(new LatLng(32.71, -117.16)));
+
 
         mSuperMap = (SuperMap) this.getFragmentManager().findFragmentById(R.id.superMapFragment);
-        mSuperMap.addAnnotation(superMapDemoAnnotation);
+        mSuperMap.addAnnotations(this.superMapDemoAnnotationList.toArray(new Annotation[]{}));
 
         mSuperMap.setMapRenderer(this);
 
@@ -41,33 +50,67 @@ public class MainActivity extends AppCompatActivity implements MapRenderer {
     @Override
     public AnnotationView viewForAnnotation(Annotation annotation) {
 
+        AnnotationView annotationView = null;
+
         /**
          * @see AnnotationView is the view that is returned.
          * @see SuperMap#dequeueReusableAnnotationViewWithIdentifier(String)
          * IT MAY RETURN NULL
          */
-        AnnotationView annotationView = mSuperMap.dequeueReusableAnnotationViewWithIdentifier(MainActivity.REUSER_ID1);
-        if (annotationView == null) {
-            annotationView = new SuperMapDemoAnnotationView(this);
-            annotationView.setAnnotation(annotation);
-            annotationView.setReuseId(MainActivity.REUSER_ID1);
+        this.count++;
 
-            annotationView.setMinimumHeight(100);
-            annotationView.setMinimumWidth(100);
-            annotationView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+        if (count % 2 == 0) {
+            annotationView = mSuperMap.dequeueReusableAnnotationViewWithIdentifier(MainActivity.REUSER_ID1);
+            if (annotationView == null) {
+                annotationView = new SuperMapDemoAnnotationView(this);
+                annotationView.setAnnotation(annotation);
+                annotationView.setReuseId(MainActivity.REUSER_ID1);
 
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
-                    (int) getResources().getDimension(R.dimen.activity_horizontal_margin),
-                    (int) getResources().getDimension(R.dimen.activity_horizontal_margin));
+                annotationView.setMinimumHeight(100);
+                annotationView.setMinimumWidth(100);
 
-            annotationView.setLayoutParams(layoutParams);
+                annotationView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorAccent));
+
+                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                        (int) getResources().getDimension(R.dimen.activity_horizontal_margin),
+                        (int) getResources().getDimension(R.dimen.activity_horizontal_margin));
+
+                annotationView.setLayoutParams(layoutParams);
+
+            } else {
+                annotationView.setAnnotation(annotation);
+            }
+
+            return annotationView;
 
         } else {
-            annotationView.setAnnotation(annotation);
-        }
+            annotationView = mSuperMap.dequeueReusableAnnotationViewWithIdentifier(MainActivity.REUSER_ID2);
+            if (annotationView == null) {
+                annotationView = new SuperMapDemoAnnotationView(this);
+                annotationView.setAnnotation(annotation);
+                annotationView.setReuseId(MainActivity.REUSER_ID2);
 
-        return annotationView;
+                annotationView.setMinimumHeight(100);
+                annotationView.setMinimumWidth(100);
+
+                annotationView.setBackgroundColor(ContextCompat.getColor(this, R.color.colorPrimaryDark));
+
+                ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                        (int) getResources().getDimension(R.dimen.activity_horizontal_margin),
+                        (int) getResources().getDimension(R.dimen.activity_horizontal_margin));
+
+                annotationView.setLayoutParams(layoutParams);
+
+            } else {
+                annotationView.setAnnotation(annotation);
+            }
+
+            return annotationView;
+
+        }
     }
+
+
 
     @Override
     public void annotationViewWillBeRemoved(AnnotationView annotationView) {

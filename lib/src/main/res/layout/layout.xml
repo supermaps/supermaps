@@ -12,7 +12,7 @@
         />
 
     <supermaps.supermaps.lib.AnnotationViewWrapper
-        android:id="@+id/touchableWrapper"
+        android:id="@+id/annotationViewWrapper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

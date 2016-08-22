@@ -6,7 +6,6 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,10 +21,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class SuperMap extends Fragment implements OnMapReadyCallback {
+public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnMapLoadedCallback {
 
     AnnotationViewWrapper annotationViewWrapper;
     private MapFragment superMapGoogleMapFragment;
@@ -39,6 +39,11 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
      * area on the screen.
      */
     private LatLngBounds latLngBounds;
+    private boolean isMapLoaded;
+
+    public void setCenterLatLng(LatLng latLng, Boolean animated){
+
+    }
 
     private GoogleMap googleMap;
 
@@ -47,6 +52,10 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
      * This allows the implementor to get callbacks from the manager
      */
     private MapRenderer mapRenderer;
+
+    public void setMapRenderer(MapRenderer mapRenderer) {
+        this.mapRenderer = mapRenderer;
+    }
 
     /**
      *
@@ -58,10 +67,6 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
 
     Map<Annotation, AnnotationView> annotationToAnnotationViewMap;
 
-    public void setCenterLatLng(LatLng latLng, Boolean animated){
-
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,11 +75,8 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
 
         this.annotationToAnnotationViewMap = new HashMap<>();
         this.mapReuseIdToAnnotationViewsQueue = new HashMap<>();
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
+        this.isMapLoaded = false;
     }
 
     @Nullable
@@ -88,11 +90,16 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     /**
      * This add an annotation to the map.
      * @param annotations
      */
-    public void addAnnotations(Annotation[] annotations) {
+    public void addAnnotations(Annotation... annotations) {
 
         for (Annotation annotation :
                 annotations) {
@@ -140,7 +147,7 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
     }
 
     /**
-     * This method gives you any annotation that is available to be reused.
+     * This method gives you any AnnotationView that is available to be reused.
      * It'll return null if no annotationView is available
      * @param reuseId the Reuseable AnnotationView Id associated with the Annotation View that you
      *                want back.
@@ -164,20 +171,6 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
         }
 
         return visibleAnnotationViewslist;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        this.annotationViewWrapper = (AnnotationViewWrapper) this.getView().findViewById(R.id.touchableWrapper);
-        this.googleMap = googleMap;
-
-        this.setMapRenderer(this.mapRenderer);
-
-        this.update();
-    }
-
-    public void setMapRenderer(MapRenderer mapRenderer) {
-        this.mapRenderer = mapRenderer;
     }
 
     /**
@@ -332,6 +325,8 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
                     throw new NullPointerException("Can not return a null annotation view from viewForAnnotation. The user must implement the method");
 
                 }
+                //set
+                annotationToAnnotationViewMap.put(annotation, annotationView);
 
                 /**
                  * Maps the annotation to the annotation View for future use when we need a view
@@ -356,17 +351,51 @@ public class SuperMap extends Fragment implements OnMapReadyCallback {
                 throw new NullPointerException("supermaps FrameLayout Rect is null");
             }
 
-            if (annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)) {
-                //View is visible even if its 1px
-                Point currentPoint = currentProjection.toScreenLocation(annotation.getLatLng());
+            Point currentPoint = currentProjection.toScreenLocation(annotation.getLatLng());
 
-                annotationView.setCenter(currentPoint);
-            } else {
-                //Enqueue the view with the reuse ID
+            annotationView.setCenter(currentPoint);
+
+            if (!annotationView.getLocalVisibleRect(superMapsFrameLayoutRect)) {
                 this.enqueueReusableAnnotationViewWithIdentifier(annotationView);
             }
+
         }
     }
 
+    /**
+     * MAP SECTION : google map callbacks
+     */
 
+    /**
+     * call back from the getMapAsync function
+     * @param googleMap
+     */
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        this.annotationViewWrapper = (AnnotationViewWrapper) this.getView().findViewById(R.id.annotationViewWrapper);
+
+        this.googleMap = googleMap;
+        this.googleMap.setOnCameraMoveListener(this);
+        this.googleMap.setOnCameraMoveStartedListener(this);
+        this.googleMap.setOnMapLoadedCallback(this);
+
+        this.setMapRenderer(this.mapRenderer);
+    }
+
+
+    @Override
+    public void onCameraMove() {
+        this.update();
+    }
+
+    @Override
+    public void onCameraMoveStarted(int i) {
+        this.update();
+    }
+
+    @Override
+    public void onMapLoaded() {
+        this.isMapLoaded = true;
+        this.update();
+    }
 }
