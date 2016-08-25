@@ -1,15 +1,15 @@
-package supermaps.supermap;
+package supermaps.supermap.Annotations;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import supermaps.supermaps.lib.Annotation;
 
 /**
- * Created by ariochdivij666 on 8/21/16.
+ * Created by ariochdivij666 on 8/24/16.
  */
-public class BoatAnnotation implements  Annotation {
+public class DBZAnnotation implements Annotation {
     private LatLng latLng;
-    private String ReuseId;
+    private static String ReuseId;
 
     @Override
     public void setLatLng(LatLng latLng) {
@@ -20,6 +20,4 @@ public class BoatAnnotation implements  Annotation {
     public LatLng getLatLng() {
         return this.latLng;
     }
-
-
 }

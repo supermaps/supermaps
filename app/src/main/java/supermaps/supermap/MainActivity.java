@@ -2,11 +2,8 @@ package supermaps.supermap;
 
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
-
-import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +19,9 @@ import supermaps.supermaps.lib.SuperMap;
 public class MainActivity extends AppCompatActivity implements MapRenderer {
 
     private SuperMap mSuperMap;
-    private List<SuperMapDemoAnnotation> superMapDemoAnnotationList;
+    private List<Annotation> mAnnotationList;
 
-    private static final String REUSER_ID1 = "demoResuseId1";
-    private static final String REUSER_ID2 = "demoResuseId2";
+
     private int count;
 
     @Override
@@ -33,17 +29,17 @@ public class MainActivity extends AppCompatActivity implements MapRenderer {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.superMapDemoAnnotationList = new ArrayList<>();
-
-        this.superMapDemoAnnotationList.add(new SuperMapDemoAnnotation());
-        this.superMapDemoAnnotationList.add(new SuperMapDemoAnnotation(new LatLng(42.87, -88.31)));
-        this.superMapDemoAnnotationList.add(new SuperMapDemoAnnotation(new LatLng(32.71, -117.16)));
-
+        initializeData();
 
         mSuperMap = (SuperMap) this.getFragmentManager().findFragmentById(R.id.superMapFragment);
-        mSuperMap.addAnnotations(this.superMapDemoAnnotationList.toArray(new Annotation[]{}));
+        mSuperMap.addAnnotations(this.mAnnotationList.toArray(new Annotation[]{}));
 
         mSuperMap.setMapRenderer(this);
+
+    }
+
+    private void initializeData() {
+        this.mAnnotationList = new ArrayList<>();
 
     }
 
@@ -60,11 +56,10 @@ public class MainActivity extends AppCompatActivity implements MapRenderer {
         this.count++;
 
         if (count % 2 == 0) {
-            annotationView = mSuperMap.dequeueReusableAnnotationViewWithIdentifier(MainActivity.REUSER_ID1);
+            annotationView = mSuperMap.dequeueReusableAnnotationViewWithIdentifier();
             if (annotationView == null) {
-                annotationView = new SuperMapDemoAnnotationView(this);
                 annotationView.setAnnotation(annotation);
-                annotationView.setReuseId(MainActivity.REUSER_ID1);
+                annotationView.setReuseId(SuperMapsConstants.ReuseIDs.BOAT);
 
                 annotationView.setMinimumHeight(100);
                 annotationView.setMinimumWidth(100);
@@ -86,7 +81,6 @@ public class MainActivity extends AppCompatActivity implements MapRenderer {
         } else {
             annotationView = mSuperMap.dequeueReusableAnnotationViewWithIdentifier(MainActivity.REUSER_ID2);
             if (annotationView == null) {
-                annotationView = new SuperMapDemoAnnotationView(this);
                 annotationView.setAnnotation(annotation);
                 annotationView.setReuseId(MainActivity.REUSER_ID2);
 
