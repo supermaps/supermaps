@@ -253,9 +253,11 @@ public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.
     private void enqueueReusableAnnotationViewWithIdentifier(AnnotationView annotationView) {
 
         if(annotationView == null) {
-            return;
-
+            throw new NullPointerException("AnnotationView cannot be null when enqueuing");
         }
+
+        //Make sure we detach the annotation reference.
+        annotationView.setAnnotation(null);
 
         if(this.mapReuseIdToAnnotationViewsQueue.containsKey(annotationView.getReuseId())) {
 
