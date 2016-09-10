@@ -209,7 +209,8 @@ public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.
 
     /**
      * @param reuseId
-     * @return
+     * @return This method gets back a reuseable AnnotationView. If this method is called and is null
+     * then the renderer needs to create an AnnotationView
      */
     @Nullable
     public AnnotationView dequeueReusableAnnotationViewWithIdentifier(String reuseId) {
@@ -219,11 +220,14 @@ public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.
         AnnotationView annotationView;
 
         if(annotationViewList != null) {
+            //We try to grab the first one, if none, we return null
             annotationView = annotationViewList.size() > 0 ? annotationViewList.get(0) : null;
         } else {
             return null;
 
         }
+
+        //AnnotationView can still be null by this point
 
         if(annotationView != null) {
             /**
