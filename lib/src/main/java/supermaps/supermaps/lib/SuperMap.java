@@ -244,7 +244,10 @@ public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.
     }
 
     /**
-     * called by the update method when trying to recycle views for a reuseid
+     * called by the update method when trying to recycle views for a
+     * This is called when a view is out of bounds of the map and flags the AnnotationView as reusable
+     * for possible reuse by adding it to
+     * @see SuperMap#mapReuseIdToAnnotationViewsQueue
      * @param annotationView
      */
     private void enqueueReusableAnnotationViewWithIdentifier(AnnotationView annotationView) {
