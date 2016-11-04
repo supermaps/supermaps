@@ -39,3 +39,8 @@ To get a SHA-1 key can be generated with :
 
 `keytool -list -v -keystore ~/.android/debug.keystore`
 If you haven't done anything fancy then the password should just be "android" 
+
+### Considerations
+1)Maintain our own projections coordinate space once the map has loaded. on map move
+                                          OR
+2)Pass through TouchEvents
