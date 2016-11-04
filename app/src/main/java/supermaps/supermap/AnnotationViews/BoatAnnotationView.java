@@ -14,7 +14,6 @@ import supermaps.supermaps.lib.SuperMap;
 
 /**
  * Created by ariochdivij666 on 8/24/16.
- * TODO FINISH THE IMPLEMENTATION of this class - 9/9/16
  */
 public class BoatAnnotationView extends AnnotationView {
 
@@ -42,7 +41,10 @@ public class BoatAnnotationView extends AnnotationView {
         ImageView imageView = new ImageView(getContext());
         imageView.setImageResource(R.drawable.smallboat);
 
-        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(100, 100)
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(100, 100);
+        imageView.setLayoutParams(layoutParams);
+
+        this.addView(imageView);
     }
 
     @Override
