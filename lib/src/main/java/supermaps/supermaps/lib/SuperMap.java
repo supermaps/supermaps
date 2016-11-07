@@ -5,12 +5,13 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.Projection;
 import com.google.android.gms.maps.model.LatLng;
@@ -25,10 +26,14 @@ import java.util.Map;
 /**
  * Created by maximilianalexander on 5/7/16.
  */
-public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.OnCameraMoveListener, GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnMapLoadedCallback {
+public class SuperMap extends Fragment implements
+        OnMapReadyCallback, GoogleMap.OnCameraMoveListener,
+        GoogleMap.OnCameraMoveStartedListener, GoogleMap.OnMapLoadedCallback,
+        TouchMapFragment.NonConsumingTouchListener
+{
 
     AnnotationViewWrapper annotationViewWrapper;
-    private MapFragment superMapGoogleMapFragment;
+    private TouchMapFragment superMapGoogleMapFragment;
     private View rootView;
 
     Rect superMapsFrameLayoutRect;
@@ -84,8 +89,11 @@ public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.layout, null);
 
-        superMapGoogleMapFragment = (MapFragment) this.getChildFragmentManager().findFragmentById(R.id.superMapGoogleMapFragment);
+
+        superMapGoogleMapFragment = (TouchMapFragment) this.getChildFragmentManager().findFragmentById(R.id.superMapGoogleMapFragment);
         superMapGoogleMapFragment.getMapAsync(this);
+
+        superMapGoogleMapFragment.setNonConsumingTouchListener(this);
 
         return rootView;
     }
@@ -406,5 +414,22 @@ public class SuperMap extends Fragment implements OnMapReadyCallback, GoogleMap.
     public void onMapLoaded() {
         this.isMapLoaded = true;
         this.update();
+    }
+
+    @Override
+    public boolean onTouch(MotionEvent motionEvent) {
+        this.update();
+        switch (motionEvent.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                // map is touched
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                return true;
+            case MotionEvent.ACTION_UP:
+                // map touch ended
+                return true;
+            default:
+                return false;
+        }
     }
 }

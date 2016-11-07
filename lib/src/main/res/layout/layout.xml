@@ -7,8 +7,7 @@
         android:id="@+id/superMapGoogleMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        class="com.google.android.gms.maps.MapFragment"
+        class="supermaps.supermaps.lib.TouchMapFragment"
         />
 
     <supermaps.supermaps.lib.AnnotationViewWrapper
